@@ -19,6 +19,11 @@ const ThreadRepository = require('../Domains/threads/ThreadRepository');
 const ThreadUseCase = require('../Applications/use_case/ThreadUseCase');
 const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres');
 
+// comment use case and service
+const CommentRepository = require('../Domains/comments/CommentRepository');
+const CommentUseCase = require('../Applications/use_case/CommentUseCase');
+const CommentRepositoryPostgres = require('./repository/CommentRepositoryPostgres');
+
 // use case
 const AddUserUseCase = require('../Applications/use_case/AddUserUseCase');
 const AuthenticationTokenManager = require('../Applications/security/AuthenticationTokenManager');
@@ -84,6 +89,23 @@ container.register([
   {
     key: ThreadRepository.name,
     Class: ThreadRepositoryPostgres,
+    parameter: {
+        dependencies: [
+          {
+            concrete: pool,
+          },
+          {
+            concrete: nanoid,
+          },
+          {
+            concrete: Jwt.token,
+          },
+        ],
+    },
+  },
+  {
+    key: CommentRepository.name,
+    Class: CommentRepositoryPostgres,
     parameter: {
         dependencies: [
           {
@@ -183,6 +205,19 @@ container.register([
         {
           name: 'threadRepository',
           internal: ThreadRepository.name,
+        },
+      ],
+    },
+  },
+  {
+    key: CommentUseCase.name,
+    Class: CommentUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'commentRepository',
+          internal: CommentRepository.name,
         },
       ],
     },
