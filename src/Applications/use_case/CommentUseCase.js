@@ -1,8 +1,10 @@
 const AddComment = require('../../Domains/comments/entities/AddComment');
+const DeleteComment = require('../../Domains/comments/entities/DeleteComment');
  
 class CommentUseCase {
-  constructor({ commentRepository }) {
+  constructor({ commentRepository, threadRepository }) {
     this._commentRepository = commentRepository;
+    this._threadRepository = threadRepository;
   }
  
   async addComment(useCasePayload) {
@@ -11,8 +13,9 @@ class CommentUseCase {
   }
 
   async deleteComment(useCasePayload){
-    const { threadId, commentId } = useCasePayload;
-    await this._commentRepository.deleteComment(commentId);
+    const deleteComment = new DeleteComment(useCasePayload);
+    await this._commentRepository.commentExists(deleteComment.commentId);
+    await this._commentRepository.deleteComment(deleteComment.commentId);
   }
 }
  
