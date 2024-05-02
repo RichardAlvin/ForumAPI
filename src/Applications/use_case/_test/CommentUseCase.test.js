@@ -8,10 +8,12 @@ describe('CommentUseCase - AddComment', () => {
     // Arrange
     const useCasePayload = {
       content: 'dicoding',
+      threadId: 'thread-123'
     };
     const mockAddedComment = new AddedComment({
       id: 'comment-123',
       content: useCasePayload.content,
+      threadId: useCasePayload.threadId
     });
  
     /** creating dependency of use case */
@@ -33,6 +35,7 @@ describe('CommentUseCase - AddComment', () => {
     expect(addedComment).toStrictEqual(new AddedComment({
       id: 'comment-123',
       content: useCasePayload.content,
+      threadId: 'thread-123'
     }));
     expect(mockCommentRepository.addComment).toBeCalledWith(new AddComment({
       content: useCasePayload.content,

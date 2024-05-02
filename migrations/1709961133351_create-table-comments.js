@@ -30,6 +30,19 @@ exports.up = (pgm) => {
             type: 'TEXT',
             notNull: true,
         },
+        is_delete: {
+            type: 'BOOLEAN',
+            notNull: true,
+            defaultValue: false
+        },
+        deleted_at: {
+            type: 'TEXT',
+            notNull: false,
+        },
+        deleted_by: {
+            type: 'TEXT',
+            notNull: false,
+        }
     })
 };
 

@@ -4,7 +4,8 @@ describe('a AddComment entities', () => {
   it('should throw error when payload did not meet data type specification', () => {
     // Arrange
     const payload = {
-      content: 123
+      content: 123,
+      threadId: 'thread-123'
     };
     // Action and Assert
     expect(() => new AddComment(payload)).toThrowError('ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
@@ -13,6 +14,7 @@ describe('a AddComment entities', () => {
     // Arrange
     const payload = {
       content: 'dicoding',
+      threadId: 'thread-123'
     };
     // Action
     const { content } = new AddComment(payload);

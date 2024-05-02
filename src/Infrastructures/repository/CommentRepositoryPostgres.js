@@ -10,19 +10,30 @@ class CommentRepositoryPostgres extends CommentRepository {
   }
  
   async addComment(addComment) {
-    const { content } = addComment;
+    const { content, threadId } = addComment;
     const id = `comment-${this._idGenerator()}`;
     const created_at = new Date().toISOString();
     const updated_at = new Date().toISOString();
  
+    //kalau mau ada huruf besar, harus pakai petik karena SQL bahasa yang case insensitive
     const query = {
-      text: 'INSERT INTO comments VALUES($1, $2, $3, $4, $5) RETURNING id, content, threadId, created_at, updated_at',
-      values: [id, content, 'test', created_at, updated_at],
+      text: 'INSERT INTO comments VALUES($1, $2, $3, $4, $5, $6) RETURNING id, content, "threadId", created_at, updated_at',
+      values: [id, content, threadId, created_at, updated_at, false],
     };
  
     const result = await this._pool.query(query);
  
     return new AddedComment({ ...result.rows[0] });
+  }
+
+  async deleteComment(commentId){
+    const deleted_at = new Date().toISOString();
+    const query = {
+      text: 'UPDATE comments SET is_delete=$1, deleted_at=$2 WHERE id=$3',
+      values: [true, deleted_at, commentId]
+    }
+
+    await this._pool.query(query);
   }
 }
  
