@@ -16,12 +16,12 @@ exports.up = (pgm) => {
             onDelete: 'cascade',
             notNull: false,
         },
-        // ownerId: {
-        //     type: 'varchar(50)',
-        //     references: 'users',
-        //     onDelete: 'cascade',
-        //     notNull: false,
-        // },
+        ownerId: {
+            type: 'varchar(50)',
+            references: 'users',
+            onDelete: 'cascade',
+            notNull: false,
+        },
         created_at: {
             type: 'TEXT',
             notNull: true,

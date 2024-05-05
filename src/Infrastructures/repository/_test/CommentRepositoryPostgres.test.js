@@ -10,6 +10,8 @@ const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
 describe('CommentRepositoryPostgres', () => {
   afterEach(async () => {
     await CommentTableTestHelper.cleanTable();
+    await ThreadTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
   });
  
   afterAll(async () => {
@@ -18,16 +20,25 @@ describe('CommentRepositoryPostgres', () => {
  
   describe('addComment function', () => {
     it('should persist add comment', async () => {
+      await UsersTableTestHelper.addUser({
+        id: 'user-123',
+        username: 'dicoding',
+        password: 'secret',
+        fullname: 'Dicoding Indonesia'
+      })
+
       await ThreadTableTestHelper.addThreads({
         id: 'thread-123',
         title: 'thread baru',
         body: 'body thread baru',
+        ownerId: 'user-123',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
       const addComment = new AddComment({
         content: 'dicoding',
-        threadId: 'thread-123'
+        threadId: 'thread-123',
+        ownerId: 'user-123'
       });
       const fakeIdGenerator = () => '123'; // stub!
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
@@ -52,6 +63,7 @@ describe('CommentRepositoryPostgres', () => {
         id: 'thread-123',
         title: 'thread baru',
         body: 'body thread baru',
+        ownerId: 'user-123',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       });
@@ -71,7 +83,7 @@ describe('CommentRepositoryPostgres', () => {
       await commentRepositoryPostgres.deleteComment('comment-123');
  
       // Assert
-      const comments = await CommentTableTestHelper.findCommentsById('comment-123');
+      const comments = await CommentTableTestHelper.checkDeletedComment('comment-123');
       expect(comments).toHaveLength(0);
     })
   })

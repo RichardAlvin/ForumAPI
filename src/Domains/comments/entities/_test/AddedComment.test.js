@@ -16,6 +16,7 @@ describe('a AddedComment entities', () => {
     const payload = {
       id: 123,
       content: 'dicoding',
+      ownerId: 321
     };
  
     // Action and Assert
@@ -25,8 +26,9 @@ describe('a AddedComment entities', () => {
   it('should create addedComment object correctly', () => {
     // Arrange
     const payload = {
-      id: 'user-123',
+      id: 'comment-123',
       content: 'dicoding',
+      ownerId: 'user-123'
     };
  
     // Action
@@ -35,5 +37,6 @@ describe('a AddedComment entities', () => {
     // Assert
     expect(addedComment.id).toEqual(payload.id);
     expect(addedComment.content).toEqual(payload.content);
+    expect(addedComment.owner).toEqual(payload.ownerId);
   });
 });

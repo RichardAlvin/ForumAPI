@@ -10,7 +10,13 @@ class ThreadsHandler {
  
   async postThreadsHandler(request, h) {
     const threadUseCase = this._container.getInstance(ThreadUseCase.name);
-    const addedThread = await threadUseCase.addThread(request.payload);
+    const { id: ownerId } = request.auth.credentials;
+
+    const useCasePayload = {
+      ...request.payload,
+      ownerId: ownerId
+    }
+    const addedThread = await threadUseCase.addThread(useCasePayload);
     const response = h.response({
       status: 'success',
       data: {
@@ -21,19 +27,20 @@ class ThreadsHandler {
     return response;
   }
 
-  async detailThreadsHandler(request){
+  async detailThreadsHandler(request, h){
     const threadUseCase = this._container.getInstance(ThreadUseCase.name);
     const useCasePayload = {
       threadId: request.params.threadId
     }
-    const detailThread = await threadUseCase.detailThread(useCasePayload);
+
+    const threadResponse = await threadUseCase.detailThread(useCasePayload);
     const response = h.response({
       status: 'success',
       data: {
-        detailThread,
+        thread: threadResponse,
       }
     });
-    response.code(201);
+    response.code(200);
     return response;
   }
 }

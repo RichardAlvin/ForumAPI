@@ -9,10 +9,12 @@ describe('ThreadUseCase - AddThread', () => {
     const useCasePayload = {
       title: 'dicoding',
       body: 'secret',
+      ownerId: 'user-123'
     };
     const mockRegisteredThread = new RegisteredThread({
       id: 'thread-123',
       title: useCasePayload.title,
+      ownerId: useCasePayload.ownerId
     });
  
     /** creating dependency of use case */
@@ -34,10 +36,12 @@ describe('ThreadUseCase - AddThread', () => {
     expect(registeredThread).toStrictEqual(new RegisteredThread({
       id: 'thread-123',
       title: useCasePayload.title,
+      ownerId: 'user-123'
     }));
     expect(mockThreadRepository.addThread).toBeCalledWith(new RegisterThread({
       title: useCasePayload.title,
-      body: useCasePayload.body
+      body: useCasePayload.body,
+      ownerId: useCasePayload.ownerId
     }));
   });
 });

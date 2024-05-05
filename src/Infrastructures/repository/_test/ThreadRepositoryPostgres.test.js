@@ -1,4 +1,5 @@
 const ThreadTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
+const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const InvariantError = require('../../../Commons/exceptions/InvariantError');
 const RegisterThread = require('../../../Domains/threads/entities/RegisterThread');
 const RegisteredThread = require('../../../Domains/threads/entities/RegisteredThread');
@@ -8,6 +9,7 @@ const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 describe('ThreadRepositoryPostgres', () => {
   afterEach(async () => {
     await ThreadTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
   });
  
   afterAll(async () => {
@@ -16,10 +18,18 @@ describe('ThreadRepositoryPostgres', () => {
  
   describe('addThread function', () => {
     it('should persist register thread', async () => {
+      await UsersTableTestHelper.addUser({
+        id: 'user-123',
+        username: 'dicoding',
+        password: 'secret',
+        fullname: 'Dicoding Indonesia'
+      })
+
       // Arrange
       const registerThread = new RegisterThread({
         title: 'dicoding',
         body: 'secret_password',
+        ownerId: 'user-123'
       });
       const fakeIdGenerator = () => '123'; // stub!
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
@@ -33,10 +43,18 @@ describe('ThreadRepositoryPostgres', () => {
     });
  
     it('should return registered user correctly', async () => {
+      await UsersTableTestHelper.addUser({
+        id: 'user-123',
+        username: 'dicoding',
+        password: 'secret',
+        fullname: 'Dicoding Indonesia'
+      })
+      
       // Arrange
       const registerThread = new RegisterThread({
         title: 'dicoding',
         body: 'secret_password',
+        ownerId: 'user-123'
       });
       const fakeIdGenerator = () => '123'; // stub!
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
@@ -48,6 +66,7 @@ describe('ThreadRepositoryPostgres', () => {
       expect(registeredThread).toStrictEqual(new RegisteredThread({
         id: 'thread-123',
         title: 'dicoding',
+        ownerId: 'user-123'
       }));
     });
   });

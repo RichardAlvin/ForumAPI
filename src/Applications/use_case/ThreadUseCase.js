@@ -1,8 +1,10 @@
 const RegisterThread = require('../../Domains/threads/entities/RegisterThread');
+const DetailThread = require('../../Domains/threads/entities/DetailThread');
  
 class ThreadUseCase {
-  constructor({ threadRepository }) {
+  constructor({ threadRepository, commentRepository }) {
     this._threadRepository = threadRepository;
+    this._commentRepository = commentRepository;
   }
  
   async addThread(useCasePayload) {
@@ -11,10 +13,12 @@ class ThreadUseCase {
   }
 
   async detailThread(useCasePayload){
-    const { threadId } = useCasePayload;
-    const detailThread = await this._threadRepository.detailThread(threadId);
-
-    return detailThread;
+    const detailThread = new DetailThread(useCasePayload);
+    await this._threadRepository.threadExists(detailThread.threadId);
+    const threadResponse = await this._threadRepository.detailThread(detailThread.threadId);
+    const commentResponse = await this._commentRepository.getCommentByThreadId(detailThread.threadId);
+    threadResponse.comments = commentResponse;
+    return threadResponse;
   }
 }
  

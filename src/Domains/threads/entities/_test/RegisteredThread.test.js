@@ -16,6 +16,7 @@ describe('a RegisteredThread entities', () => {
     const payload = {
       id: 123,
       title: 'dicoding',
+      ownerId: 321
     };
  
     // Action and Assert
@@ -25,8 +26,9 @@ describe('a RegisteredThread entities', () => {
   it('should create registeredThread object correctly', () => {
     // Arrange
     const payload = {
-      id: 'user-123',
+      id: 'thread-123',
       title: 'dicoding',
+      ownerId: 'user-123'
     };
  
     // Action
@@ -35,5 +37,6 @@ describe('a RegisteredThread entities', () => {
     // Assert
     expect(registeredThread.id).toEqual(payload.id);
     expect(registeredThread.title).toEqual(payload.title);
+    expect(registeredThread.owner).toEqual(payload.ownerId);
   });
 });
