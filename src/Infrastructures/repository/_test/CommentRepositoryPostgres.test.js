@@ -91,7 +91,10 @@ describe('CommentRepositoryPostgres', () => {
 
       // Assert
       const comments = await CommentTableTestHelper.checkDeletedComment('comment-123');
+      const detailComment = await CommentTableTestHelper.findCommentsById('comment-123');
       expect(comments).toHaveLength(0);
+      expect(detailComment[0].is_delete).toEqual(true);
+      expect(detailComment[0].deleted_at).toBeTruthy();
     })
   });
 
@@ -255,6 +258,7 @@ describe('CommentRepositoryPostgres', () => {
         id: 'comment-123',
         content: 'comment baru',
         username: 'richard',
+        is_delete: false,
         date: '2024-05-06T20:00:00.992Z',
       }]);
     })
