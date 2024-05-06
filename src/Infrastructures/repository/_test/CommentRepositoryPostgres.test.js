@@ -46,10 +46,15 @@ describe('CommentRepositoryPostgres', () => {
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
  
       // Action
-      await commentRepositoryPostgres.addComment(addComment);
- 
+      const addedComment = await commentRepositoryPostgres.addComment(addComment);
+
       // Assert
       const comments = await CommentTableTestHelper.findCommentsById('comment-123');
+      expect(addedComment).toStrictEqual(new AddedComment({
+        id: comments[0].id,
+        content: comments[0].content,
+        ownerId: comments[0].ownerId
+      }))
       expect(comments).toHaveLength(1);
     });
   });
@@ -82,8 +87,8 @@ describe('CommentRepositoryPostgres', () => {
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
  
       // Action
-      await commentRepositoryPostgres.deleteComment('comment-123');
- 
+      const deletedComment = await commentRepositoryPostgres.deleteComment('comment-123');
+
       // Assert
       const comments = await CommentTableTestHelper.checkDeletedComment('comment-123');
       expect(comments).toHaveLength(0);
@@ -91,6 +96,12 @@ describe('CommentRepositoryPostgres', () => {
   });
 
   describe('commentExists function', () => {
+    it('should throw not found error when comment not exists', async () => {
+      const fakeIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator)
+      await expect(commentRepositoryPostgres.commentExists('comment-123')).rejects.toThrowError(NotFoundError);
+    })
+
     it('should get comment when comment exists', async () => {
       const fakeIdGenerator = () => '123';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);

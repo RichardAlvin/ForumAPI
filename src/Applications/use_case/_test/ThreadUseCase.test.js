@@ -79,6 +79,21 @@ describe('ThreadUseCase - AddThread', () => {
       }
     ];
 
+    const commentData = [
+      {
+        id: 'comment-123',
+        username: 'alvin',
+        date: '2024-05-06T20:00:00.992Z',
+        content: 'content comment baru',
+      },
+      {
+        id: 'comment-321',
+        username: 'alvin',
+        date: '2024-05-06T20:00:00.992Z',
+        content: '**komentar telah dihapus**',
+      }
+    ];
+
     const mockThreadRepository = new ThreadRepository()
     const mockCommentRepository = new CommentRepository()
 
@@ -107,5 +122,6 @@ describe('ThreadUseCase - AddThread', () => {
     expect(detailThread.body).toEqual(useCaseThread.body);
     expect(detailThread.date).toEqual(useCaseThread.date);
     expect(detailThread.username).toEqual(useCaseThread.username);
+    expect(detailThread.comments).toEqual(commentData);
   })
 });

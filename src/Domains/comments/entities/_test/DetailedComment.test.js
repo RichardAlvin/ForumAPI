@@ -38,4 +38,22 @@ describe('a DetailedComment entities', () => {
     expect(detailComment.content).toEqual(payload.content);
     expect(detailComment.date).toEqual(payload.date);
   });
+
+  it('should create deletecomment object correctly with Deleted Content', () => {
+    //Arrange
+    const payload = {
+      id: 'comment-123',
+      content: 'comment baru',
+      date: '2024-05-06T20:00:00.992Z',
+      username: 'richard',
+      is_delete: true
+    };
+    // Action
+    const detailComment = new DetailedComment(payload);
+    // Assert
+    expect(detailComment.id).toEqual(payload.id);
+    expect(detailComment.username).toEqual(payload.username);
+    expect(detailComment.content).toEqual("**komentar telah dihapus**");
+    expect(detailComment.date).toEqual(payload.date);
+  })
 });

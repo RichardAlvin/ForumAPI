@@ -104,6 +104,12 @@ describe('ThreadRepositoryPostgres', () => {
   })
 
   describe('threadExists function', () => {
+    it('should throw not found error when thread not exists', async () => {
+      const fakeIdGenerator = () => '123';
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator)
+      await expect(threadRepositoryPostgres.threadExists('thread-123')).rejects.toThrowError(NotFoundError);
+    })
+
     it('should get thread when thread is exists', async () => {
       //arrange
       const fakeIdGenerator = () => '123';
