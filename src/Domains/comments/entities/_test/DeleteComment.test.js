@@ -26,8 +26,10 @@ describe('a DeleteComment entities', () => {
       ownerId: 'user-123'
     };
     // Action
-    const { content } = new DeleteComment(payload);
+    const { commentId, threadId, ownerId } = new DeleteComment(payload);
     // Assert
-    expect(content).toEqual(payload.content);
+    expect(commentId).toEqual(payload.commentId);
+    expect(threadId).toEqual(payload.threadId);
+    expect(ownerId).toEqual(payload.ownerId);
   });
 });

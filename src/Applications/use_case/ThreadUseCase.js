@@ -1,5 +1,6 @@
 const RegisterThread = require('../../Domains/threads/entities/RegisterThread');
 const DetailThread = require('../../Domains/threads/entities/DetailThread');
+const DetailedComment = require('../../Domains/comments/entities/DetailedComment');
  
 class ThreadUseCase {
   constructor({ threadRepository, commentRepository }) {
@@ -17,7 +18,9 @@ class ThreadUseCase {
     await this._threadRepository.threadExists(detailThread.threadId);
     const threadResponse = await this._threadRepository.detailThread(detailThread.threadId);
     const commentResponse = await this._commentRepository.getCommentByThreadId(detailThread.threadId);
-    threadResponse.comments = commentResponse;
+    threadResponse.comments = commentResponse.map((comment) =>{
+      return new DetailedComment(comment);
+    });
     return threadResponse;
   }
 }
