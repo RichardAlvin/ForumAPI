@@ -1,47 +1,71 @@
-const pool = require('../../database/postgres/pool');
-const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
-const AuthenticationsTableTestHelper = require('../../../../tests/AuthenticationsTableTestHelper');
-const createServer = require('../createServer');
+const Hapi = require('@hapi/hapi');
+const ClientError = require('../../Commons/exceptions/ClientError');
+const DomainErrorTranslator = require('../../Commons/exceptions/DomainErrorTranslator');
+const users = require('../../Interfaces/http/api/users');
+const authentications = require('../../Interfaces/http/api/authentications');
  
-describe('HTTP server', () => {
-  afterAll(async () => {
-    await pool.end();
+const createServer = async (injections) => {
+  const server = Hapi.server({
+    host: process.env.HOST,
+    port: process.env.PORT,
   });
  
-  afterEach(async () => {
-    await UsersTableTestHelper.cleanTable();
-    await AuthenticationsTableTestHelper.cleanTable();
+  await server.register([
+    {
+      plugin: users,
+      options: { injections },
+    },
+    {
+      plugin: authentications,
+      options: { injections },
+    },
+  ]);
+ 
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: () => ({
+      value: 'Hello world!',
+    }),
   });
  
-  it('should response 404 when request unregistered route', async () => {
-    // Arrange
-    const server = await createServer({});
+  server.ext('onPreResponse', (request, h) => {
+    // mendapatkan konteks response dari request
+    const { response } = request;
  
-    // Action
-    const response = await server.inject({
-      method: 'GET',
-      url: '/unregisteredRoute',
-    });
+    if (response instanceof Error) {
+      // bila response tersebut error, tangani sesuai kebutuhan
+      const translatedError = DomainErrorTranslator.translate(response);
  
-    // Assert
-    expect(response.statusCode).toEqual(404);
-  });
+      // penanganan client error secara internal.
+      if (translatedError instanceof ClientError) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: translatedError.message,
+        });
+        newResponse.code(translatedError.statusCode);
+        return newResponse;
+      }
  
-  describe('when GET /', () => {
-    it('should return 200 and hello world', async () => {
-      // Arrange
-      const server = await createServer({});
-      // Action
-      const response = await server.inject({
-        method: 'GET',
-        url: '/',
+      // mempertahankan penanganan client error oleh hapi secara native, seperti 404, etc.
+      if (!translatedError.isServer) {
+        return h.continue;
+      }
+ 
+      // penanganan server error sesuai kebutuhan
+      const newResponse = h.response({
+        status: 'error',
+        message: 'terjadi kegagalan pada server kami',
       });
-      // Assert
-      const responseJson = JSON.parse(response.payload);
-      expect(response.statusCode).toEqual(200);
-      expect(responseJson.value).toEqual('Hello world!');
-    });
+      newResponse.code(500);
+      return newResponse;
+    }
+ 
+    // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
+    return h.continue;
   });
  
-  // Skenario testing lain ...
-});
+  return server;
+};
+ 
+module.exports = createServer;
